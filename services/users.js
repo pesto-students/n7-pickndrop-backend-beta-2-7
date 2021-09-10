@@ -31,7 +31,7 @@ export default app=>{
                 email,
                 phone,
                 role,
-            })
+            });
         }catch(e){
             console.log(e);
             res.status(500);

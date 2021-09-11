@@ -1,5 +1,6 @@
 import {User} from '../models/index.js'
 import {send} from '../utils/email.js';
+import {STATUS_OK,SERVER_ERROR} from '../constants/index.js';
 export default app=>{
     app.post("/users/authenticate",async (req,res)=>
     {
@@ -26,7 +27,7 @@ export default app=>{
                 otp
             });
             await send(email,`Your OTP is ${otp}`);
-            res.status(200);
+            res.status(STATUS_OK);
             return res.json({
                 email,
                 phone,
@@ -34,7 +35,7 @@ export default app=>{
             });
         }catch(e){
             console.log(e);
-            res.status(500);
+            res.status(SERVER_ERROR);
             return res.end(e.toString())
         }
     });
@@ -63,7 +64,7 @@ export default app=>{
                 otp
             });
             await send(email,`Your OTP is ${otp}`);
-            res.status(200);
+            res.status(STATUS_OK);
             return res.json({
                 email,
                 phone,
@@ -71,20 +72,22 @@ export default app=>{
             });
         }catch(e){
             console.log(e);
-            res.status(500);
+            res.status(SERVER_ERROR);
             return res.end(e.toString());
         }
     });
     app.post("/otp/authenticate",async (req,res)=>{
-        const {otp}=req.body;
+        const {otp,email,phone}=req.body;
         try{
             const user=await User.findOne({
+                email,
+                phone,
                 otp
             });
             if(!user){
                 throw "Wrong OTP";
             }
-            res.status(200);
+            res.status(STATUS_OK);
             return res.json({
                 email:user.email,
                 phone:user.phone,
@@ -92,7 +95,7 @@ export default app=>{
             });
         }catch(e){
             console.log(e);
-            res.status(500);
+            res.status(SERVER_ERROR);
             return res.end(e.toString());
         }
     })

@@ -3,15 +3,16 @@ import mongoose from "mongoose";
 import users from './services/users.js'
 import bodyParser from 'body-parser';
 import cors from 'cors';
-const url="mongodb+srv://dbUser:dbUserPassword@cluster0.xdwsy.mongodb.net/dbName?retryWrites=true&w=majority";
+import dotenv from 'dotenv';
+dotenv.config()
 const startServer=async ()=>{
     try{
-        await mongoose.connect(url);
+        await mongoose.connect(process.env.MONGODB_URL);
         const app=express();
         app.use(bodyParser.json());
         app.use(cors());
         users(app);
-        app.listen(4000);
+        app.listen(process.env.PORT || 4000);
     }catch(e){
         console.log(e);
     }

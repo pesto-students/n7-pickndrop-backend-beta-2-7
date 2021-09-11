@@ -76,13 +76,15 @@ export default app=>{
             return res.end(e.toString());
         }
     });
-    app.post("/otp/authenticate",async (req,res)=>{
+    app.post("/user/otp/authenticate",async (req,res)=>{
         const {otp,email,phone}=req.body;
+        const role="user";
         try{
             const user=await User.findOne({
                 email,
                 phone,
-                otp
+                otp,
+                role
             });
             if(!user){
                 throw "Wrong OTP";
@@ -92,6 +94,87 @@ export default app=>{
                 email:user.email,
                 phone:user.phone,
                 role:user.role,
+            });
+        }catch(e){
+            console.log(e);
+            res.status(SERVER_ERROR);
+            return res.end(e.toString());
+        }
+    });
+    app.post("/driver/otp/authenticate",async (req,res)=>{
+        const {otp,email,phone}=req.body;
+        const role="driver";
+        try{
+            const user=await User.findOne({
+                email,
+                phone,
+                otp,
+                role
+            });
+            if(!user){
+                throw "Wrong OTP";
+            }
+            res.status(STATUS_OK);
+            return res.json({
+                email:user.email,
+                phone:user.phone,
+                role:user.role,
+            });
+        }catch(e){
+            console.log(e);
+            res.status(SERVER_ERROR);
+            return res.end(e.toString());
+        }
+    })
+    app.post("/driver/register",async (req,res)=>{
+        const {
+            firstName,
+			lastName,
+			fatherName,
+			city,
+			completeAddress,
+			language,
+			date,
+			emergencyContact,
+			workExperience,
+			vehicleDetails,
+			panCard,
+			aadharCard,
+			drivingLicense,
+            email,
+            phone
+        }=req.body;
+        const role="driver";
+        try{
+            const user=await User.findOne({
+                email,
+                phone,
+                role
+            });
+            if(!user){
+                throw "User Not Exist";
+            }
+            await User.updateOne({
+                email,
+                phone
+            },{
+                firstName,
+			lastName,
+			fatherName,
+			city,
+			completeAddress,
+			language,
+			date,
+			emergencyContact,
+			workExperience,
+			vehicleDetails,
+			panCard,
+			aadharCard,
+			drivingLicense,
+            })
+            res.status(STATUS_OK);
+            return res.json({
+                
             });
         }catch(e){
             console.log(e);

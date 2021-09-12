@@ -131,4 +131,42 @@ export default (app) => {
 			return res.end(e.toString());
 		}
 	});
+    app.post("/driver/register", async (req, res) => {
+		const {
+			firstName,
+			lastName,
+			fatherName,
+			city,
+			completeAddress,
+			language,
+			date,
+			emergencyContact,
+			workExperience,
+			vehicleDetails,
+			panCard,
+			aadharCard,
+			drivingLicense,
+		} = req.body;
+		try {
+			await Driver.updateOne({
+				firstName,
+				lastName,
+				fatherName,
+				city,
+				completeAddress,
+				language,
+				date,
+				emergencyContact,
+				workExperience,
+				vehicleDetails,
+				panCard,
+				aadharCard,
+				drivingLicense,
+			});
+		} catch (e) {
+			console.log(e);
+			res.status(SERVER_ERROR);
+			return res.end(e.toString());
+		}
+	});
 };

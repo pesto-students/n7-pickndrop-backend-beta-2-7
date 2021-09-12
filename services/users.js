@@ -77,12 +77,11 @@ export default app=>{
         }
     });
     app.post("/user/otp/authenticate",async (req,res)=>{
-        const {otp,email,phone}=req.body;
+        const {otp,email}=req.body;
         const role="user";
         try{
             const user=await User.findOne({
                 email,
-                phone,
                 otp,
                 role
             });
@@ -102,12 +101,11 @@ export default app=>{
         }
     });
     app.post("/driver/otp/authenticate",async (req,res)=>{
-        const {otp,email,phone}=req.body;
+        const {otp,email}=req.body;
         const role="driver";
         try{
             const user=await User.findOne({
                 email,
-                phone,
                 otp,
                 role
             });
@@ -141,22 +139,19 @@ export default app=>{
 			panCard,
 			aadharCard,
 			drivingLicense,
-            email,
-            phone
+            email
         }=req.body;
         const role="driver";
         try{
             const user=await User.findOne({
                 email,
-                phone,
                 role
             });
             if(!user){
                 throw "User Not Exist";
             }
             await User.updateOne({
-                email,
-                phone
+                email                
             },{
                 firstName,
 			lastName,

@@ -13,6 +13,7 @@ const DriverSchema = new Schema({
 	lastName: String,
 	fatherName: String,
 	city: String,
+    preferredLocation: String,
 	completeAddress: String,
 	language: String,
 	date: Date,

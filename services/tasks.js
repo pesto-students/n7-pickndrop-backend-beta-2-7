@@ -2,6 +2,18 @@ import { Task } from "../models/index.js";
 import { send } from "../utils/email.js";
 import { STATUS_OK, SERVER_ERROR } from "../constants/index.js";
 export default (app) => {
+  app.get("/tasks", async (req, res) => {
+    try {
+      res.status(STATUS_OK);
+      return res.json({
+        data: await Task.find({}),
+      });
+    } catch (e) {
+      console.log(e);
+      res.status(SERVER_ERROR);
+      return res.end(e.toString());
+    }
+  });
   app.post("/tasks/create", async (req, res) => {
     const { sender, receiver, title, description } = req.body;
     try {

@@ -1,7 +1,28 @@
-import { User } from "../models/index.js";
+import { Driver, User } from "../models/index.js";
 import { send } from "../utils/email.js";
 import { STATUS_OK, SERVER_ERROR } from "../constants/index.js";
+import multer from "multer";
+
+const storage = multer.diskStorage({
+	destination: function (req, file, cb) {
+		cb(null, "public");
+	},
+	filename: (req, file, cb) => {
+		cb(null, Date.now() + "-" + file.originalname);
+	},
+});
+
+const upload = multer({ storage: storage }).single("file");
+
 export default (app) => {
+	app.post("/upload", async (req, res) => {
+		upload(req, res, (err) => {
+			if (err) {
+				res.sendStatus(500);
+			}
+			res.send(req.file);
+		});
+	});
 	app.post("/users/authenticate", async (req, res) => {
 		const { email, phone } = req.body;
 		const role = "user";
@@ -84,6 +105,24 @@ export default (app) => {
 			return res.end(e.toString());
 		}
 	});
+	app.post("/driver/checkRegistration", async (req, res) => {
+		const { email, phone } = req.body;
+		const role = "driver";
+		try {
+			const user = await User.findOne({
+				email,
+				phone,
+				role,
+			});
+			if (user) {
+				throw "already Registered";
+			}
+		} catch (e) {
+			console.log(e);
+			res.status(SERVER_ERROR);
+			return res.end(e.toString());
+		}
+	});
 	app.post("/user/otp/authenticate", async (req, res) => {
 		const { otp, email, phone } = req.body;
 		try {
@@ -131,7 +170,7 @@ export default (app) => {
 			return res.end(e.toString());
 		}
 	});
-    app.post("/driver/register", async (req, res) => {
+	app.post("/driver/register", async (req, res) => {
 		const {
 			firstName,
 			lastName,
@@ -148,7 +187,24 @@ export default (app) => {
 			drivingLicense,
 		} = req.body;
 		try {
-			await Driver.updateOne({
+			const driver = new Driver({
+				firstName,
+				lastName,
+				fatherName,
+				city,
+				completeAddress,
+				language,
+				date,
+				emergencyContact,
+				workExperience,
+				vehicleDetails,
+				panCard,
+				aadharCard,
+				drivingLicense,
+			});
+			await driver.save();
+			res.status(STATUS_OK);
+			return res.json({
 				firstName,
 				lastName,
 				fatherName,

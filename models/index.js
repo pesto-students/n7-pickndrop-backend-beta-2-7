@@ -31,12 +31,10 @@ const TaskSchema = new Schema({
     longitude: Number,
   },
   receiver: {
-    sender: {
-      address: String,
-      phoneNo: String,
-      latitude: Number,
-      longitude: Number,
-    },
+    address: String,
+    phoneNo: String,
+    latitude: Number,
+    longitude: Number,
   },
   title: String,
   description: String,

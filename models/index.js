@@ -38,6 +38,7 @@ const TaskSchema = new Schema({
   },
   title: String,
   description: String,
+  price: Number,
 });
 export const Task = model("Task", TaskSchema);
 export const User = model("User", UserSchema);

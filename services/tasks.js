@@ -1,6 +1,7 @@
 import { Task } from "../models/index.js";
-import { send } from "../utils/email.js";
+import geolib from "geolib";
 import { STATUS_OK, SERVER_ERROR } from "../constants/index.js";
+const { getDistance } = geolib;
 export default (app) => {
   app.get("/tasks", async (req, res) => {
     try {
@@ -22,6 +23,18 @@ export default (app) => {
         receiver,
         title,
         description,
+        price:
+          getDistance(
+            {
+              lat: sender.latitude,
+              lng: sender.longitude,
+            },
+            {
+              lat: receiver.latitude,
+              lng: receiver.longitude,
+            },
+            1
+          ) * 10,
       });
       await task.save();
       res.status(STATUS_OK);

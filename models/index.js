@@ -42,6 +42,11 @@ const TaskSchema = new Schema({
 	title: String,
 	description: String,
 	price: Number,
+    orderId: String,
+    isActive: Boolean,
+	isCancelled: Boolean,
+	isPickedUp: Boolean,
+	isDelieverd: Boolean,
 });
 
 export const Task = model("Task", TaskSchema);

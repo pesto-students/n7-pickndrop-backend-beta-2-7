@@ -23,25 +23,27 @@ const DriverSchema = new Schema({
   aadharCard: Number,
   drivingLicense: String,
 });
+
 const TaskSchema = new Schema({
   sender: {
     address: String,
     phoneNo: String,
     latitude: Number,
     longitude: Number,
+    name: String,
   },
   receiver: {
     address: String,
     phoneNo: String,
     latitude: Number,
     longitude: Number,
+    name: String,
   },
   title: String,
   description: String,
   price: Number,
-  paymentMethod: Object,
 });
+
 export const Task = model("Task", TaskSchema);
 export const User = model("User", UserSchema);
-
 export const Driver = model("Driver", DriverSchema);

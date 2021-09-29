@@ -19,28 +19,45 @@ export default (app) => {
       return res.end(e.toString());
     }
   });
+
   app.post("/tasks/create", async (req, res) => {
-    const { sender, receiver, title, description } = req.body;
+    function orderNumber() {
+      let now = Date.now().toString();
+      now += now + Math.floor(Math.random() * 10);
+      return [now.slice(0, 4), now.slice(4, 10), now.slice(10, 14)].join("-");
+    }
+    const {
+      sender,
+      receiver,
+      title,
+      description,
+      isActive,
+      isCancelled,
+      isDelieverd,
+      isPickedUp,
+    } = req.body;
     try {
       const task = new Task({
         sender,
         receiver,
         title,
         description,
+        isActive,
+        isCancelled,
+        isDelieverd,
+        isPickedUp,
+        orderId: orderNumber(),
         price:
-          convertDistance(
-            getDistance(
-              {
-                lat: sender.latitude,
-                lng: sender.longitude,
-              },
-              {
-                lat: receiver.latitude,
-                lng: receiver.longitude,
-              },
-              1
-            ),
-            "km"
+          getDistance(
+            {
+              lat: sender.latitude,
+              lng: sender.longitude,
+            },
+            {
+              lat: receiver.latitude,
+              lng: receiver.longitude,
+            },
+            1
           ) * 10,
       });
       await task.save();
@@ -52,20 +69,96 @@ export default (app) => {
       return res.end(e.toString());
     }
   });
-  app.post("/tasks/payment/:id", async (req, res) => {
-    const { id } = req.params;
-    const { paymentMethod } = req.body;
+
+  app.post("/tasks/accept", async (req, res) => {
+    const { orderId } = req.body;
     try {
-      await Task.updateOne(
-        {
-          id,
-        },
-        {
-          paymentMethod,
-        }
-      );
+      const task = await Task.findOne({
+        orderId,
+      });
+      if (task) {
+        await Task.updateOne(
+          { orderId: orderId },
+          { $set: { isActive: true } }
+        );
+      }
       res.status(STATUS_OK);
-      return res.json({});
+      return res.json({
+        orderId: task.orderId,
+        isActive: true,
+      });
+    } catch (e) {
+      console.log(e);
+      res.status(SERVER_ERROR);
+      return res.end(e.toString());
+    }
+  });
+
+  app.post("/tasks/pickedup", async (req, res) => {
+    const { orderId } = req.body;
+    try {
+      const task = await Task.findOne({
+        orderId,
+      });
+      if (task) {
+        await Task.updateOne(
+          { orderId: orderId },
+          { $set: { isPickedUp: true } }
+        );
+      }
+      res.status(STATUS_OK);
+      return res.json({
+        orderId: task.orderId,
+        isPickedUp: true,
+      });
+    } catch (e) {
+      console.log(e);
+      res.status(SERVER_ERROR);
+      return res.end(e.toString());
+    }
+  });
+
+  app.post("/tasks/delivered", async (req, res) => {
+    const { orderId } = req.body;
+    try {
+      const task = await Task.findOne({
+        orderId,
+      });
+      if (task) {
+        await Task.updateOne(
+          { orderId: orderId },
+          { $set: { isDelieverd: true } }
+        );
+      }
+      res.status(STATUS_OK);
+      return res.json({
+        orderId: task.orderId,
+        isDelieverd: true,
+      });
+    } catch (e) {
+      console.log(e);
+      res.status(SERVER_ERROR);
+      return res.end(e.toString());
+    }
+  });
+
+  app.post("/tasks/cancel", async (req, res) => {
+    const { orderId } = req.body;
+    try {
+      const task = await Task.findOne({
+        orderId,
+      });
+      if (task) {
+        await Task.updateOne(
+          { orderId: orderId },
+          { $set: { isCancelled: true } }
+        );
+      }
+      res.status(STATUS_OK);
+      return res.json({
+        orderId: task.orderId,
+        isCancelled: true,
+      });
     } catch (e) {
       console.log(e);
       res.status(SERVER_ERROR);

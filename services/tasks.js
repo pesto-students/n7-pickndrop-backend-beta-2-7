@@ -165,4 +165,23 @@ export default (app) => {
       return res.end(e.toString());
     }
   });
+  app.post("/tasks/payment/:id", async (req, res) => {
+    const { paymentMethod } = req.body;
+    const { id } = req.params;
+    try {
+      await Task.updateOne(
+        {
+          _id: id,
+        },
+        {
+          paymentMethod,
+        }
+      );
+      return res.json({});
+    } catch (e) {
+      console.log(e);
+      res.status(SERVER_ERROR);
+      return res.end(e.toString());
+    }
+  });
 };

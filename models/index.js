@@ -47,6 +47,7 @@ const TaskSchema = new Schema({
   isCancelled: Boolean,
   isPickedUp: Boolean,
   isDelieverd: Boolean,
+  paymentMethod: Object,
 });
 
 const ImageSchema = new Schema({

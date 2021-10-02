@@ -218,24 +218,8 @@ export default (app) => {
         aadharCard,
         drivingLicense,
       });
-      await driver.save();
       res.status(STATUS_OK);
-      return res.json({
-        firstName,
-        lastName,
-        fatherName,
-        city,
-        preferredLocation,
-        completeAddress,
-        language,
-        date,
-        emergencyContact,
-        workExperience,
-        vehicleDetails,
-        panCard,
-        aadharCard,
-        drivingLicense,
-      });
+      return res.json(await driver.save());
     } catch (e) {
       console.log(e);
       res.status(SERVER_ERROR);

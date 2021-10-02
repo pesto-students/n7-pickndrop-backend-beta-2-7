@@ -1,17 +1,45 @@
-import { Task } from "../models/index.js";
+import { Task, Driver } from "../models/index.js";
+import { calculateDistance } from "../utils/distance.js";
 import geolib from "geolib";
 import { STATUS_OK, SERVER_ERROR } from "../constants/index.js";
 const secretKey =
   "sk_test_51JddslSAjlEV7TUaFIQOmzPrZoPp3H9wyLKfKjwG1oaOUCqJR4q9494UOlkz1cj0vdNzjAuNPqORrgbtKTJIG5oP00cw8NehWA";
 const publicKey =
   "pk_test_51JddslSAjlEV7TUa9n6qlp5fNdcHx3Lj8MS7sSM7bLIkTlkZYXzgmu0zhXZ93OJ6GIt0skAkxfgFbUMIcJnVJqW100TQ7L9y5f";
-const { getDistance, convertDistance } = geolib;
+
+const preferredLatLngs = {
+  Kormangala: {
+    lat: 12.9354922,
+    lng: 77.6146828,
+  },
+};
 export default (app) => {
-  app.get("/tasks", async (req, res) => {
+  app.get("/tasks/:id?", async (req, res) => {
+    const { id } = req.params;
     try {
       res.status(STATUS_OK);
+      let data = await Task.find({});
+      if (id) {
+        const {
+          _doc: { preferredLocation },
+        } = await Driver.findOne({
+          _id: id,
+        });
+        if (preferredLocation) {
+          const { lat, lng } = preferredLatLngs[preferredLocation];
+          data = data.filter((item) => {
+            const { sender } = item;
+            const distance = calculateDistance(sender, {
+              latitude: lat,
+              longitude: lng,
+            });
+            console.log(distance);
+            return distance < 3;
+          });
+        }
+      }
       return res.json({
-        data: await Task.find({}),
+        data,
       });
     } catch (e) {
       console.log(e);
@@ -47,18 +75,7 @@ export default (app) => {
         isDelieverd,
         isPickedUp,
         orderId: orderNumber(),
-        price:
-          getDistance(
-            {
-              lat: sender.latitude,
-              lng: sender.longitude,
-            },
-            {
-              lat: receiver.latitude,
-              lng: receiver.longitude,
-            },
-            1
-          ) * 10,
+        price: calculateDistance(sender, receiver) * 10,
       });
       await task.save();
       res.status(STATUS_OK);

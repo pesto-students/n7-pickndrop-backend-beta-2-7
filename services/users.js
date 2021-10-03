@@ -81,7 +81,7 @@ export default (app) => {
   app.post("/driver/authenticate", async (req, res) => {
     const { email, phone } = req.body;
     const role = "driver";
-    const otp = 111111; //Math.floor(Math.random() * 10e5);
+    const otp = Math.floor(Math.random() * 10e5);
     try {
       let user = await User.findOne({
         email,

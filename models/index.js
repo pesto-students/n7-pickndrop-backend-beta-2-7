@@ -19,6 +19,8 @@ const DriverSchema = new Schema({
   emergencyContact: Number,
   workExperience: Number,
   vehicleDetails: String,
+  avatar: String,
+  userId: String,
   panCard: String,
   aadharCard: Number,
   drivingLicense: String,
@@ -51,12 +53,11 @@ const TaskSchema = new Schema({
 });
 
 const ImageSchema = new Schema({
-    img:
-    {
-        data: Buffer,
-        contentType: String
-    }
-})
+  img: {
+    data: Buffer,
+    contentType: String,
+  },
+});
 
 export const Task = model("Task", TaskSchema);
 export const User = model("User", UserSchema);

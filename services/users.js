@@ -81,20 +81,20 @@ export default (app) => {
   app.post("/driver/authenticate", async (req, res) => {
     const { email, phone } = req.body;
     const role = "driver";
-    const otp = Math.floor(Math.random() * 10e5);
+    const otp = 111111; //Math.floor(Math.random() * 10e5);
     try {
-      const user = await User.findOne({
+      let user = await User.findOne({
         email,
         phone,
         role,
       });
       if (!user) {
-        const user = new User({
+        user = new User({
           email,
           phone,
           role,
         });
-        await user.save();
+        user = await user.save();
       }
       await User.updateOne(
         {
@@ -108,11 +108,7 @@ export default (app) => {
       );
       await send(email, `Your OTP is ${otp}`);
       res.status(STATUS_OK);
-      return res.json({
-        email,
-        phone,
-        role,
-      });
+      return res.json(user);
     } catch (e) {
       console.log(e);
       res.status(SERVER_ERROR);
@@ -194,17 +190,20 @@ export default (app) => {
       completeAddress,
       language,
       date,
+      avatar,
       emergencyContact,
       workExperience,
       vehicleDetails,
       panCard,
       aadharCard,
       drivingLicense,
+      userId,
     } = req.body;
     try {
       const driver = new Driver({
         firstName,
         lastName,
+        avatar,
         fatherName,
         city,
         preferredLocation,
@@ -217,6 +216,7 @@ export default (app) => {
         panCard,
         aadharCard,
         drivingLicense,
+        userId,
       });
       res.status(STATUS_OK);
       return res.json(await driver.save());

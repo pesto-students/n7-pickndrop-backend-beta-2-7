@@ -20,11 +20,10 @@ export default (app) => {
       res.status(STATUS_OK);
       let data = await Task.find({});
       if (id) {
-        const {
-          _doc: { preferredLocation },
-        } = await Driver.findOne({
-          _id: id,
-        });
+        const { preferredLocation = Object.keys(preferredLatLngs)[0] } =
+          await Driver.findOne({
+            _id: id,
+          });
         if (preferredLocation) {
           const { lat, lng } = preferredLatLngs[preferredLocation];
           data = data.filter((item) => {
@@ -33,7 +32,6 @@ export default (app) => {
               latitude: lat,
               longitude: lng,
             });
-            console.log(distance);
             return distance < 3;
           });
         }

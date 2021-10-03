@@ -36,6 +36,7 @@ export default (app) => {
           });
         }
       }
+      data = data.reverse();
       return res.json({
         data,
       });

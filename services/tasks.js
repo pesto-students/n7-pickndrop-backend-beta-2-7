@@ -1,6 +1,6 @@
-import { Task, Driver } from "../models/index.js";
+import { Task, User } from "../models/index.js";
 import { calculateDistance } from "../utils/distance.js";
-import geolib from "geolib";
+import { getId } from "../utils/jwt.js";
 import { STATUS_OK, SERVER_ERROR } from "../constants/index.js";
 const secretKey =
   "sk_test_51JddslSAjlEV7TUaFIQOmzPrZoPp3H9wyLKfKjwG1oaOUCqJR4q9494UOlkz1cj0vdNzjAuNPqORrgbtKTJIG5oP00cw8NehWA";
@@ -12,18 +12,31 @@ const preferredLatLngs = {
     lat: 12.9354922,
     lng: 77.6146828,
   },
+  Whitefeild: {
+    lat: 12.9646087,
+    lng: 77.719023,
+  },
+  "J P Nagar": {
+    lat: 12.8897795,
+    lng: 77.5430551,
+  },
+  Indiranagar: {
+    lat: 12.97296,
+    lng: 77.6294794,
+  },
 };
 export default (app) => {
-  app.get("/tasks/:id?", async (req, res) => {
-    const { id } = req.params;
+  app.get("/tasks", async (req, res) => {
     try {
+      const id = getId(req.headers.authorization);
       res.status(STATUS_OK);
       let data = await Task.find({});
       if (id) {
-        const { preferredLocation = Object.keys(preferredLatLngs)[0] } =
-          await Driver.findOne({
-            _id: id,
-          });
+        const {
+          _doc: { preferredLocation },
+        } = await User.findOne({
+          _id: id,
+        });
         if (preferredLocation) {
           const { lat, lng } = preferredLatLngs[preferredLocation];
           data = data.filter((item) => {

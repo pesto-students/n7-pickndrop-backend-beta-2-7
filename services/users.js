@@ -1,5 +1,6 @@
-import { Driver, User } from "../models/index.js";
+import { User } from "../models/index.js";
 import { send } from "../utils/email.js";
+import { getToken, getId } from "../utils/jwt.js";
 import { STATUS_OK, SERVER_ERROR } from "../constants/index.js";
 import multer from "multer";
 import fs from "fs";
@@ -42,24 +43,22 @@ export default (app) => {
     const role = "user";
     const otp = Math.floor(Math.random() * 10e5);
     try {
-      const user = await User.findOne({
+      let user = await User.findOne({
         email,
         phone,
         role,
       });
       if (!user) {
-        const user = new User({
+        user = new User({
           email,
           phone,
           role,
         });
-        await user.save();
+        user = await user.save();
       }
       await User.updateOne(
         {
-          email,
-          phone,
-          role,
+          _id: user._doc._id,
         },
         {
           otp,
@@ -98,9 +97,7 @@ export default (app) => {
       }
       await User.updateOne(
         {
-          email,
-          phone,
-          role,
+          _id: user._doc._id,
         },
         {
           otp,
@@ -109,24 +106,6 @@ export default (app) => {
       await send(email, `Your OTP is ${otp}`);
       res.status(STATUS_OK);
       return res.json(user);
-    } catch (e) {
-      console.log(e);
-      res.status(SERVER_ERROR);
-      return res.end(e.toString());
-    }
-  });
-  app.post("/driver/checkRegistration", async (req, res) => {
-    const { email, phone } = req.body;
-    const role = "driver";
-    try {
-      const user = await User.findOne({
-        email,
-        phone,
-        role,
-      });
-      if (user) {
-        throw "already Registered";
-      }
     } catch (e) {
       console.log(e);
       res.status(SERVER_ERROR);
@@ -144,11 +123,11 @@ export default (app) => {
       if (!user) {
         throw "Wrong OTP";
       }
+      const token = getToken(user._doc._id.toString());
       res.status(STATUS_OK);
       return res.json({
-        email: user.email,
-        phone: user.phone,
-        role: user.role,
+        ...user._doc,
+        token,
       });
     } catch (e) {
       console.log(e);
@@ -168,11 +147,11 @@ export default (app) => {
       if (!user) {
         throw "Wrong OTP";
       }
+      const token = getToken(user._doc._id.toString());
       res.status(STATUS_OK);
       return res.json({
-        email: user.email,
-        phone: user.phone,
-        role: user.role,
+        ...user._doc,
+        token,
       });
     } catch (e) {
       console.log(e);
@@ -197,29 +176,33 @@ export default (app) => {
       panCard,
       aadharCard,
       drivingLicense,
-      userId,
     } = req.body;
     try {
-      const driver = new Driver({
-        firstName,
-        lastName,
-        avatar,
-        fatherName,
-        city,
-        preferredLocation,
-        completeAddress,
-        language,
-        date,
-        emergencyContact,
-        workExperience,
-        vehicleDetails,
-        panCard,
-        aadharCard,
-        drivingLicense,
-        userId,
-      });
+      const id = getId(req.headers.authorization);
+      await User.updateOne(
+        {
+          _id: id,
+        },
+        {
+          firstName,
+          lastName,
+          avatar,
+          fatherName,
+          city,
+          preferredLocation,
+          completeAddress,
+          language,
+          date,
+          emergencyContact,
+          workExperience,
+          vehicleDetails,
+          panCard,
+          aadharCard,
+          drivingLicense,
+        }
+      );
       res.status(STATUS_OK);
-      return res.json(await driver.save());
+      return res.json(await User.findOne({ _id: id }));
     } catch (e) {
       console.log(e);
       res.status(SERVER_ERROR);

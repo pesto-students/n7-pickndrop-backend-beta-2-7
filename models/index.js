@@ -6,13 +6,11 @@ const UserSchema = new Schema({
   phone: String,
   role: String,
   otp: String,
-});
-
-const DriverSchema = new Schema({
   firstName: String,
   lastName: String,
   fatherName: String,
   city: String,
+  preferredLocation: String,
   completeAddress: String,
   language: String,
   date: Date,
@@ -52,14 +50,5 @@ const TaskSchema = new Schema({
   paymentMethod: Object,
 });
 
-const ImageSchema = new Schema({
-  img: {
-    data: Buffer,
-    contentType: String,
-  },
-});
-
 export const Task = model("Task", TaskSchema);
 export const User = model("User", UserSchema);
-export const Driver = model("Driver", DriverSchema);
-export const Image = model("Image", ImageSchema);

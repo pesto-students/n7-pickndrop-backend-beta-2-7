@@ -66,7 +66,6 @@ export default (app) => {
       now += now + Math.floor(Math.random() * 10);
       return [now.slice(0, 4), now.slice(4, 10), now.slice(10, 14)].join("-");
     }
-    const price = 10 * Math.ceil(calculateDistance(sender, receiver));
     const {
       sender,
       receiver,
@@ -77,6 +76,7 @@ export default (app) => {
       isDelieverd,
       isPickedUp,
     } = req.body;
+    const price = 10 * Math.ceil(calculateDistance(sender, receiver));
     try {
       const task = new Task({
         sender,

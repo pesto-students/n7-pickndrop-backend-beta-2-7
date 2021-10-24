@@ -4,7 +4,9 @@ import { getToken, getId } from "../utils/jwt.js";
 import { STATUS_OK, SERVER_ERROR } from "../constants/index.js";
 import multer from "multer";
 import fs from "fs";
-
+const guestEmail = "guest@gmail.com";
+const guestPhoneNo = "1234567890";
+const guestOtp = "123456";
 const storage = multer.diskStorage({
   destination: function (req, file, cb) {
     cb(null, "public");
@@ -41,7 +43,10 @@ export default (app) => {
   app.post("/users/authenticate", async (req, res) => {
     const { email, phone } = req.body;
     const role = "user";
-    const otp = Math.floor(Math.random() * 10e5);
+    let otp = Math.floor(Math.random() * 10e5);
+    if (email === guestEmail && phone === guestPhoneNo) {
+      otp = guestOtp;
+    }
     try {
       let user = await User.findOne({
         email,
@@ -80,7 +85,10 @@ export default (app) => {
   app.post("/driver/authenticate", async (req, res) => {
     const { email, phone } = req.body;
     const role = "driver";
-    const otp = Math.floor(Math.random() * 10e5);
+    let otp = Math.floor(Math.random() * 10e5);
+    if (email === guestEmail && phone === guestPhoneNo) {
+      otp = guestOtp;
+    }
     try {
       let user = await User.findOne({
         email,

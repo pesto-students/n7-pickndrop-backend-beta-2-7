@@ -69,7 +69,9 @@ export default (app) => {
           otp,
         }
       );
-      await send(email, `Your OTP is ${otp}`);
+      if (email !== guestEmail || phone !== guestPhoneNo) {
+        await send(email, `Your OTP is ${otp}`);
+      }
       res.status(STATUS_OK);
       return res.json({
         email,
@@ -111,7 +113,9 @@ export default (app) => {
           otp,
         }
       );
-      await send(email, `Your OTP is ${otp}`);
+      if (email !== guestEmail || phone !== guestPhoneNo) {
+        await send(email, `Your OTP is ${otp}`);
+      }
       res.status(STATUS_OK);
       return res.json(user);
     } catch (e) {
